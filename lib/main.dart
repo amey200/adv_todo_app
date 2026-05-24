@@ -1,5 +1,5 @@
+import 'package:adv_to_do_app8/view/splash_screen.dart';
 import 'package:flutter/material.dart';
-import "package:adv_to_do_app8/user_login_screen.dart";
 void main() {
   runApp(const MainApp());
 }
@@ -11,7 +11,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: UserLoginScreen(),
+      home: SplashScreen(),
         
     );
   }

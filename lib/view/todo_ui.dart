@@ -1,10 +1,10 @@
+import "package:adv_to_do_app8/widget/custom_snackbar.dart";
 import 'package:flutter/material.dart';
 import "package:google_fonts/google_fonts.dart";
-import "package:adv_to_do_app8/todo_model.dart";
+import "package:adv_to_do_app8/model/todo_model.dart";
 import "package:intl/intl.dart";
-import "package:adv_to_do_app8/database.dart";
-import "package:adv_to_do_app8/user_controller.dart";
-
+import "package:adv_to_do_app8/model/database.dart";
+import "package:adv_to_do_app8/controller/user_controller.dart";
 
 class TodoApp extends StatefulWidget {
   const TodoApp({super.key});
@@ -14,10 +14,12 @@ class TodoApp extends StatefulWidget {
 }
 
 class _TodoAppState extends State<TodoApp> {
-
   //todoCardsList Data
   List<ToDoModel> todoCardsList = [];
-  
+
+  //custom snackbar
+  CustomSnackbar customSnackbarObj = CustomSnackbar();
+
   //initState()
   @override
   void initState() {
@@ -27,17 +29,15 @@ class _TodoAppState extends State<TodoApp> {
     getUserData();
   }
 
-
-
   //data coming from sqfLite dataBase
   void getData() async {
     List<Map> cardList = await TodoDatabase().getTodoItems();
-    
-    for(var element in cardList){
+
+    for (var element in cardList) {
       todoCardsList.add(
         ToDoModel(
-          date:element['date'],
-          description:element['description'],
+          date: element['date'],
+          description: element['description'],
           title: element['title'],
           id: element['id'],
         ),
@@ -45,7 +45,6 @@ class _TodoAppState extends State<TodoApp> {
     }
 
     setState(() {});
-
   }
 
   //time method getting hour for checking moons
@@ -65,10 +64,9 @@ class _TodoAppState extends State<TodoApp> {
 
   //getUserData
   void getUserData() async {
-  await userObj.getSharedPrefData();
-  setState(() {});
-}
-
+    await userObj.getSharedPrefData();
+    setState(() {});
+  }
 
   //ColorList
   List cardColorsList = [
@@ -77,7 +75,6 @@ class _TodoAppState extends State<TodoApp> {
     Color.fromRGBO(250, 249, 232, 1),
     Color.fromRGBO(250, 232, 250, 1),
   ];
-
 
   //TextEditingController Call
   TextEditingController titleController = TextEditingController();
@@ -93,46 +90,59 @@ class _TodoAppState extends State<TodoApp> {
 
   //Submit Button Logic
   void submit(bool doEdit, [ToDoModel? obj]) {
-    if (titleController.text.isNotEmpty &&
-        descriptionController.text.isNotEmpty &&
-        dateController.text.isNotEmpty) {
+    if (titleController.text.trim().isNotEmpty &&
+        descriptionController.text.trim().isNotEmpty &&
+        dateController.text.trim().isNotEmpty) {
       if (doEdit) {
-        obj!.title = titleController.text;
-        obj.description = descriptionController.text;
-        obj.date = dateController.text;
+        obj!.title = titleController.text.trim();
+        obj.description = descriptionController.text.trim();
+        obj.date = dateController.text.trim();
 
-        Map<String, dynamic> mapObj ={
+        Map<String, dynamic> mapObj = {
           'title': obj.title,
           'description': obj.description,
           'date': obj.date,
           'id': obj.id,
         };
         TodoDatabase().updateTodoItem(mapObj);
+
+        customSnackbarObj.showCustomSnackbar(
+          context,
+          message: "Edit Card Successfully",
+          bgColor: Colors.green,
+        );
       } else {
         todoCardsList.add(
           ToDoModel(
-            title: titleController.text,
-            description: descriptionController.text,
-            date: dateController.text,
+            title: titleController.text.trim(),
+            description: descriptionController.text.trim(),
+            date: dateController.text.trim(),
           ),
         );
 
         Map<String, dynamic> dataMap = {
-          'title': titleController.text,
-          'date': dateController.text,
-          'description': descriptionController.text,
+          'title': titleController.text.trim(),
+          'date': dateController.text.trim(),
+          'description': descriptionController.text.trim(),
         };
 
         TodoDatabase().insertTodoItem(dataMap);
-      }
-      clearController();
-      setState(() {});
-    } else {
-      clearController();
-      setState(() {});
-    }
 
-    Navigator.of(context).pop();
+        customSnackbarObj.showCustomSnackbar(
+          context,
+          message: "Add Card Successfully",
+          bgColor: Colors.green,
+        );
+      }
+
+      clearController();
+      setState(() {});
+      Navigator.of(context).pop();
+    } //else {
+    //   clearController();
+    //   setState(() {});
+
+    // }
   }
 
   //BottomSheet
@@ -142,7 +152,12 @@ class _TodoAppState extends State<TodoApp> {
       isScrollControlled: true,
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: MediaQuery.of(context).viewInsets.bottom,),
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -158,19 +173,19 @@ class _TodoAppState extends State<TodoApp> {
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 10),
-            
+
                 //Title
                 Text(
-                  "Title",
+                  "title",
                   style: GoogleFonts.quicksand(
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                     color: Color.fromRGBO(111, 81, 255, 1),
                   ),
                 ),
-            
+
                 SizedBox(
                   height: 50,
                   child: TextField(
@@ -178,25 +193,27 @@ class _TodoAppState extends State<TodoApp> {
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Color.fromRGBO(111, 81, 255, 1)),
+                        borderSide: BorderSide(
+                          color: Color.fromRGBO(111, 81, 255, 1),
+                        ),
                       ),
-                      hintText: "Enter Title",
+                      hintText: "title",
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 10),
-            
+
                 //Description
                 Text(
-                  "Description",
+                  "description",
                   style: GoogleFonts.quicksand(
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                     color: Color.fromRGBO(111, 81, 255, 1),
                   ),
                 ),
-            
+
                 SizedBox(
                   height: 70,
                   child: TextField(
@@ -206,55 +223,59 @@ class _TodoAppState extends State<TodoApp> {
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Color.fromRGBO(111, 81, 255, 1)),
+                        borderSide: BorderSide(
+                          color: Color.fromRGBO(111, 81, 255, 1),
+                        ),
                       ),
-                      hintText: "Enter Description",
-            
+                      hintText: "description",
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 10),
-            
+
                 //Date
                 Text(
-                  "Date",
+                  "date",
                   style: GoogleFonts.quicksand(
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                     color: Color.fromRGBO(111, 81, 255, 1),
                   ),
                 ),
-            
+
                 SizedBox(
                   height: 50,
                   child: TextField(
+                    readOnly: true,
                     controller: dateController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(color: Color.fromRGBO(111, 81, 255, 1)),
+                        borderSide: BorderSide(
+                          color: Color.fromRGBO(111, 81, 255, 1),
+                        ),
                       ),
-                      hintText: "Select Date",
+                      hintText: "date",
                       suffixIcon: Icon(Icons.calendar_month_outlined),
                     ),
-            
+
                     onTap: () async {
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
                         firstDate: DateTime(2026),
                         lastDate: DateTime(2028),
                       );
-            
+
                       dateController.text = DateFormat.yMMMd().format(
                         pickedDate!,
                       );
                     },
                   ),
                 ),
-            
+
                 SizedBox(height: 20),
-            
+
                 //Button
                 Center(
                   child: SizedBox(
@@ -268,16 +289,16 @@ class _TodoAppState extends State<TodoApp> {
                           submit(false);
                         }
                       },
-            
+
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(111, 81, 255, 1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-            
+
                       child: Text(
-                        "Submit",
+                        "Add Card",
                         style: GoogleFonts.inter(
                           fontSize: 25,
                           fontWeight: FontWeight.w700,
@@ -296,9 +317,71 @@ class _TodoAppState extends State<TodoApp> {
     );
   }
 
+  void showDeleteCardAlertDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Notice",
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Color.fromRGBO(0, 0, 0, 1),
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to delete this card?",
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+              color: Color.fromRGBO(0, 0, 0, 1),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "Cancel",
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Color.fromRGBO(0, 0, 0, 1),
+                ),
+              ),
+            ),
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () {
+                int id = todoCardsList[index].id;
+
+                todoCardsList.removeAt(index);
+                TodoDatabase().deleteTodoItem(id);
+
+                customSnackbarObj.showCustomSnackbar(context, message: "Delete card successfully", bgColor: Colors.green);
+                
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+              child: Text(
+                "Delete",
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   UserController userObj = UserController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -422,7 +505,8 @@ class _TodoAppState extends State<TodoApp> {
                                               SizedBox(height: 10),
 
                                               Text(
-                                               todoCardsList[index].description,
+                                                todoCardsList[index]
+                                                    .description,
                                                 style: GoogleFonts.quicksand(
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.w500,
@@ -455,11 +539,10 @@ class _TodoAppState extends State<TodoApp> {
                                             titleController.text =
                                                 todoCardsList[index].title;
                                             descriptionController.text =
-                                                todoCardsList[index].description;
+                                                todoCardsList[index]
+                                                    .description;
                                             dateController.text =
                                                 todoCardsList[index].date;
-
-                                            
 
                                             showBottomSheet(
                                               true,
@@ -473,11 +556,7 @@ class _TodoAppState extends State<TodoApp> {
 
                                         GestureDetector(
                                           onTap: () {
-                                            int id = todoCardsList[index].id;
-
-                                            todoCardsList.removeAt(index);
-                                            TodoDatabase().deleteTodoItem(id);
-                                            setState(() {});
+                                            showDeleteCardAlertDialog(index);
                                           },
                                           child: Icon(
                                             Icons.delete_outline_rounded,
@@ -502,16 +581,17 @@ class _TodoAppState extends State<TodoApp> {
       ),
 
       floatingActionButton: SizedBox(
-        height: 45.5,
-        width: 45.5,
+        height: 70,
+        width: 70,
         child: FloatingActionButton(
           backgroundColor: Color.fromRGBO(111, 81, 255, 1),
           shape: CircleBorder(),
           onPressed: () {
+            clearController();
             showBottomSheet(false);
           },
 
-          child: Icon(Icons.add_outlined, size: 45.5, color: Colors.white),
+          child: Icon(Icons.add_outlined, size: 60, color: Colors.white),
         ),
       ),
     );
