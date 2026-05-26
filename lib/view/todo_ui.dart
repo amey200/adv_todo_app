@@ -480,7 +480,7 @@ class _TodoAppState extends State<TodoApp> {
                                               30,
                                             ),
                                             child: Image.asset(
-                                              "assets/to_do.jpg",
+                                              "assets/to_do_logo.jpeg",
                                               fit: BoxFit.cover,
                                             ),
                                           ),

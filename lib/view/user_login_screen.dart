@@ -49,7 +49,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(200),
                               child: Image.asset(
-                                "assets/to_do.jpg",
+                                "assets/to_do_logo.jpeg",
                                 height: 150,
                                 width: 150,
                                 fit: BoxFit.cover,

@@ -2,7 +2,7 @@
     <application
         android:label="To Do"
         android:name="${applicationName}"
-        android:icon="@mipmap/to_do">
+        android:icon="@mipmap/to_do_logo">
         <activity
             android:name=".MainActivity"
             android:exported="true"
