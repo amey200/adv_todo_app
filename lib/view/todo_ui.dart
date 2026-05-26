@@ -361,7 +361,7 @@ class _TodoAppState extends State<TodoApp> {
                 todoCardsList.removeAt(index);
                 TodoDatabase().deleteTodoItem(id);
 
-                customSnackbarObj.showCustomSnackbar(context, message: "Delete card successfully", bgColor: Colors.green);
+                customSnackbarObj.showCustomSnackbar(context, message: "Delete card successfully", bgColor: Colors.red);
                 
                 Navigator.of(context).pop();
                 setState(() {});
