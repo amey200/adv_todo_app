@@ -4,7 +4,6 @@ import 'package:adv_to_do_app8/controller/user_controller.dart';
 import 'package:adv_to_do_app8/view/todo_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -25,6 +24,8 @@ class _SplashScreenState extends State<SplashScreen> {
   getUserName() async {
     await Future.delayed(Duration(seconds: 2), () async {
       await userControllerObj.getSharedPrefData();
+
+      if (!mounted) return;
 
       if (userControllerObj.userLogged) {
         Navigator.of(context).pushReplacement(
@@ -55,13 +56,24 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           Expanded(
             child: Center(
-              child: Image.asset("assets/to_do_logo.jpeg", height: 150, width: 150),
+              child: Image.asset(
+                "assets/to_do_logo.jpeg",
+                height: 150,
+                width: 150,
+              ),
             ),
           ),
 
-          Text("To Do App", style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600, color: Color.fromRGBO(0, 0, 0, 1))),
-        
-          SizedBox(height: 50,),
+          Text(
+            "To Do App",
+            style: GoogleFonts.poppins(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Color.fromRGBO(0, 0, 0, 1),
+            ),
+          ),
+
+          SizedBox(height: 50),
         ],
       ),
     );

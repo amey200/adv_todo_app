@@ -57,6 +57,8 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                             ),
                           ),
                         ),
+                        SizedBox(height: 20,),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -125,7 +127,10 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                                   ),
                                 );
                                 setState(() {});
+                                }else {
+                                  customSnackbarObj.showCustomSnackbar(context, message: "Please Loggin First!", bgColor: Colors.red);
                                 }
+
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
